@@ -123,6 +123,8 @@ public class XODots {
 
     private static boolean checkWin(char symbol, int numberOfIdenticalCells) {
         //проверка выигрыша сводится к подсчету повторяющихся подряд идущих символов в строке, столбце и диагоналях
+        //условие проверки: текущая и следующая(предыдущая) клетки совпадают И текущая соответствует символу на входе метода
+        //Если цепочка совпадений заканчивается до достижения заданного числа, счетчик обнуляется
         int count = 0; //счетчик совпадений
         //проверка горизонталей
         for (int j = 0; j < SIZE; j++) {
@@ -144,18 +146,21 @@ public class XODots {
         }
         //проверка диагоналей
         for (int i = 0; i < SIZE; i++) {
+            //диагонали параллельные главной и выше нее
             for (int j = 0; j < SIZE - i - 1; j++) {
                 if (map[i + j][j] == map[i + j + 1][j + 1] & map[i + j][j] == symbol) count++;
                 else count = 0;
                 if (count == numberOfIdenticalCells - 1) return true;
             }
             count = 0;
+            //диагонали, параллельные побочной и выше нее
             for (int j = 0; j < i; j++) {
                 if (map[i - j][j] == map[i - j - 1][j + 1] & map[i - j][j] == symbol) count++;
                 else count = 0;
                 if (count == numberOfIdenticalCells - 1) return true;
             }
             count = 0;
+            //диагонали, параллельные побочной и ниже нее
             for (int j = 0; j < SIZE - i - 1; j++) {
                 if (map[i + j][SIZE - j - 1] == map[i + j + 1][SIZE - j - 2] & map[i + j][SIZE - j - 1] == symbol)
                     count++;
@@ -163,6 +168,7 @@ public class XODots {
                 if (count == numberOfIdenticalCells - 1) return true;
             }
             count = 0;
+            //диагонали, параллельные главной и ниже нее
             for (int j = 0; j < i; j++) {
                 if (map[i - j][SIZE - j - 1] == map[i - j - 1][SIZE - j - 2] & map[i - j][SIZE - j - 1] == symbol)
                     count++;
