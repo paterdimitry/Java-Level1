@@ -17,7 +17,10 @@ public class XODots {
     public static void main(String[] args) {
         initMap();
         printMap();
+        turnGame();
+    }
 
+    private static void turnGame() {
         while (true) {
             humanTurn();
             printMap();
