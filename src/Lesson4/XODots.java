@@ -20,26 +20,6 @@ public class XODots {
         turnGame();
     }
 
-    private static void turnGame() {
-        while (true) {
-            humanTurn();
-            printMap();
-            if (checkWin(DOT_X, DOTS_TO_WIN)) {
-                System.out.println("Вы победили! Поздравляем!");
-                System.exit(0);
-            }
-            if (isMapFull()) System.exit(0);
-
-            computerTurn();
-            printMap();
-            if (checkWin(DOT_O, DOTS_TO_WIN)) {
-                System.out.println("Победил компьютер");
-                System.exit(0);
-            }
-            if (isMapFull()) System.exit(0);
-        }
-    }
-
     private static void initMap() {
         map = new char[SIZE][SIZE];
         for (int i = 0; i < SIZE; i++)
@@ -57,6 +37,26 @@ public class XODots {
             for (int j = 0; j < SIZE; j++)
                 System.out.printf("%2c", map[j][i]);
             System.out.println();
+        }
+    }
+
+    private static void turnGame() {
+        while (true) {
+            humanTurn();
+            printMap();
+            if (checkWin(DOT_X, DOTS_TO_WIN)) {
+                System.out.println("Вы победили! Поздравляем!");
+                System.exit(0);
+            }
+            if (isMapFull()) System.exit(0);
+
+            computerTurn();
+            printMap();
+            if (checkWin(DOT_O, DOTS_TO_WIN)) {
+                System.out.println("Победил компьютер");
+                System.exit(0);
+            }
+            if (isMapFull()) System.exit(0);
         }
     }
 
