@@ -7,10 +7,11 @@ public class XODots {
 
     public static char[][] map;
     public static final int SIZE = 5;
-    public static final int DOTS_TO_WIN = 3;
+    public static final int DOTS_TO_WIN = 4;
     public static final char DOT_X = 'X';
     public static final char DOT_O = 'O';
     public static final char DOT_EMPTY = '•';
+    public static boolean firstTurnMarker = true;
     public static Scanner in = new Scanner(System.in);
     public static Random rand = new Random();
 
@@ -85,21 +86,31 @@ public class XODots {
 
     private static void computerTurn() {
         int[] coordinates;
-        coordinates = checkNextTurnToWin(DOTS_TO_WIN, DOT_O); //Проверяем возможность победить на этом ходу
-        //Если на прошлой проверке не удалось найти выигрышную позицию, выполняем поиск хода для "перехвата" игрока
-        if (coordinates[0] == -1)
-            for (int numberOfIdenticalCells = 2; numberOfIdenticalCells <= DOTS_TO_WIN; numberOfIdenticalCells++)
-                coordinates = checkNextTurnToWin(numberOfIdenticalCells, DOT_X);
-        //Таким образом мы найдем ту клетку, которая даст наибольшую вероятность победы для человека.
-        //Если же и таких позиций не выявлено, то компьютер ходит случайно
-        if (coordinates[0] == -1) {
-            do {
-                coordinates[0] = rand.nextInt(SIZE);
-                coordinates[1] = rand.nextInt(SIZE);
-            } while (map[coordinates[0]][coordinates[1]] != DOT_EMPTY);
+        if (firstTurnMarker)
+            coordinates = randomComputerTurn();
+        else {
+            coordinates = checkNextTurnToWin(DOTS_TO_WIN, DOT_O); //Проверяем возможность победить на этом ходу
+            //Если на прошлой проверке не удалось найти выигрышную позицию, выполняем поиск хода для "перехвата" игрока
+            if (coordinates[0] == -1)
+                for (int numberOfIdenticalCells = DOTS_TO_WIN; numberOfIdenticalCells > 2 && coordinates[0] == -1; numberOfIdenticalCells--)
+                    coordinates = checkNextTurnToWin(numberOfIdenticalCells, DOT_X);
+            //Таким образом мы найдем ту клетку, которая даст наибольшую вероятность победы для человека.
+            //Если же и таких позиций не выявлено, то компьютер ходит случайно
+            if (coordinates[0] == -1)
+                coordinates = randomComputerTurn();
         }
         map[coordinates[0]][coordinates[1]] = DOT_O;
         System.out.println("Компьютер походил в клетку " + (coordinates[0] + 1) + " " + (coordinates[1] + 1));
+    }
+
+    private static int[] randomComputerTurn() {
+        int[] coordinates = {0, 0};
+        do {
+            coordinates[0] = rand.nextInt(SIZE);
+            coordinates[1] = rand.nextInt(SIZE);
+        } while (map[coordinates[0]][coordinates[1]] != DOT_EMPTY);
+        firstTurnMarker = false;
+        return coordinates;
     }
 
     //Перебираем массив на возможность выигрышной или предвыигрышной ситуации. Если выигрышная ситуация возможна, то
