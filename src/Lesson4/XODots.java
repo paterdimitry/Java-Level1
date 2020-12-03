@@ -6,12 +6,14 @@ import java.util.Scanner;
 public class XODots {
 
     public static char[][] map;
-    public static final int SIZE = 5;
+    public static final int SIZE = 9;
     public static final int DOTS_TO_WIN = 4;
     public static final char DOT_X = 'X';
     public static final char DOT_O = 'O';
     public static final char DOT_EMPTY = '•';
     public static boolean firstTurnMarker = true;
+    public static int lastRandomTurnX;
+    public static int lastRandomTurnY;
     public static Scanner in = new Scanner(System.in);
     public static Random rand = new Random();
 
@@ -86,8 +88,11 @@ public class XODots {
 
     private static void computerTurn() {
         int[] coordinates;
-        if (firstTurnMarker)
+        if (firstTurnMarker) {
             coordinates = randomComputerTurn();
+            lastRandomTurnX = coordinates[0];
+            lastRandomTurnY = coordinates[1];
+        }
         else {
             coordinates = checkNextTurnToWin(DOTS_TO_WIN, DOT_O); //Проверяем возможность победить на этом ходу
             //Если на прошлой проверке не удалось найти выигрышную позицию, выполняем поиск хода для "перехвата" игрока
@@ -95,12 +100,19 @@ public class XODots {
                 for (int numberOfIdenticalCells = DOTS_TO_WIN; numberOfIdenticalCells > 2 && coordinates[0] == -1; numberOfIdenticalCells--)
                     coordinates = checkNextTurnToWin(numberOfIdenticalCells, DOT_X);
             //Таким образом мы найдем ту клетку, которая даст наибольшую вероятность победы для человека.
-            //Если же и таких позиций не выявлено, то компьютер ходит случайно
-            if (coordinates[0] == -1)
-                coordinates = randomComputerTurn();
+            //Если же и таких позиций не выявлено, то компьютер ходит случайно в окрестностях предыдущего случайного хода
+            //Таким образом, если компьютер заблокирует угрозу от пользователя и новой угрозы не возникнет, он будет
+            //развивать свою первоначальную стратегию, накапливая "нолики"
+            if (coordinates[0] == -1) {
+                coordinates = randomComputerTurn(lastRandomTurnX, lastRandomTurnY);
+                lastRandomTurnX = coordinates[0];
+                lastRandomTurnY = coordinates[1];
+            }
         }
         map[coordinates[0]][coordinates[1]] = DOT_O;
         System.out.println("Компьютер походил в клетку " + (coordinates[0] + 1) + " " + (coordinates[1] + 1));
+
+
     }
 
     private static int[] randomComputerTurn() {
@@ -110,6 +122,25 @@ public class XODots {
             coordinates[1] = rand.nextInt(SIZE);
         } while (map[coordinates[0]][coordinates[1]] != DOT_EMPTY);
         firstTurnMarker = false;
+        return coordinates;
+    }
+
+    private static int[] randomComputerTurn(int lastTurnX, int lastTurnY) {
+        int[] coordinates = {0, 0};
+        //объявляем переменные для обеспечения заданного диапазона рандома
+        int rangeX = 3, rangeY = 3;
+        int startRangeX = lastTurnX - 1, startRangeY = lastTurnY - 1;
+
+        //если предыдущий ход был сделан на границах поля, то диапазон сужается
+        if (lastTurnX == 0) { rangeX = 2; startRangeX = 0; }
+        if (lastTurnX == SIZE - 1) { rangeX = 2; startRangeX = SIZE - 2; }
+        if (lastTurnY == 0) { rangeY = 2; startRangeY = 0; }
+        if (lastTurnY == SIZE - 1) { rangeY = 2; startRangeY = SIZE - 2; }
+
+        do {
+            coordinates[0] = rand.nextInt(rangeX) + startRangeX;
+            coordinates[1] = rand.nextInt(rangeY) + startRangeY;
+        } while (map[coordinates[0]][coordinates[1]] != DOT_EMPTY);
         return coordinates;
     }
 
